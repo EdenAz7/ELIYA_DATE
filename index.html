@@ -5,147 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>שאלה חשובה 😄</title>
   <style>
-    :root {
-      --bg1: #0b1020;
-      --bg2: #141a33;
+    :root{
+      --bg1:#0b1020; --bg2:#141a33;
       --card: rgba(255,255,255,0.08);
       --border: rgba(255,255,255,0.14);
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.72);
-      --yes: #22c55e;
-      --no: #ef4444;
+      --yes:#22c55e; --no:#ef4444;
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 20% 20%, #1d2a6d 0%, transparent 55%),
-                  radial-gradient(1000px 700px at 80% 40%, #7c2d12 0%, transparent 50%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2));
-      color: var(--text);
-      overflow: hidden;
-      -webkit-text-size-adjust: 100%;
+    html,body{
+      height:100%;
+      margin:0;
+      font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% 20%, #1d2a6d 0%, transparent 55%),
+        radial-gradient(1000px 700px at 80% 40%, #7c2d12 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      overflow:hidden;
+      -webkit-text-size-adjust:100%;
     }
 
-    .wrap {
-      height: 100%;
-      display: grid;
-      place-items: center;
-      padding: 24px;
+    .wrap{
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
     }
 
-    .card {
-      width: min(720px, 94vw);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px 22px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    .card{
+      width:min(720px,94vw);
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:28px 22px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.35);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      text-align: center;
+      text-align:center;
 
-      position: relative; /* זירת תנועה ל"לא" */
-      overflow: hidden;   /* לא יוצא מהכרטיס */
-      z-index: 1;
+      position:relative;   /* הזירה */
+      overflow:hidden;     /* שלא יצא מהכרטיס */
+      z-index:1;
     }
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(22px, 4vw, 34px);
-      letter-spacing: 0.2px;
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(22px,4vw,34px);
+      letter-spacing:.2px;
     }
 
-    .sub {
-      margin: 0 0 20px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.5;
+    .sub{
+      margin:0 0 20px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.5;
     }
 
-    .btnRow {
-      position: relative;
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 6px;
-      min-height: 56px; /* כדי שלא יקפוץ כשה"לא" הופך absolute */
+    .btnRow{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:6px;
+      min-height:56px; /* שלא יקפוץ */
     }
 
-    button {
-      border: 0;
-      border-radius: 999px;
-      padding: 12px 18px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
+    button{
+      border:0;
+      border-radius:999px;
+      padding:12px 18px;
+      font-size:18px;
+      font-weight:700;
+      cursor:pointer;
+      user-select:none;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-
-      transition:
-        transform 0.12s ease,
-        filter 0.12s ease,
-        left 0.08s linear,
-        top 0.08s linear;
+      transition: transform .12s ease, filter .12s ease, left .08s linear, top .08s linear;
     }
-    button:active { transform: scale(0.98); }
+    button:active{ transform:scale(.98); }
 
-    #yesBtn {
-      background: linear-gradient(180deg, #34d399, var(--yes));
-      color: #07240f;
-      min-width: 150px;
-      box-shadow: 0 10px 30px rgba(34,197,94,0.25);
+    #yesBtn{
+      background:linear-gradient(180deg,#34d399,var(--yes));
+      color:#07240f;
+      min-width:150px;
+      box-shadow:0 10px 30px rgba(34,197,94,0.25);
     }
 
-    #noBtn {
-      background: linear-gradient(180deg, #f87171, var(--no));
-      color: #2a0b0b;
-      min-width: 150px;
-      box-shadow: 0 10px 30px rgba(239,68,68,0.25);
+    #noBtn{
+      background:linear-gradient(180deg,#f87171,var(--no));
+      color:#2a0b0b;
+      min-width:150px;
+      box-shadow:0 10px 30px rgba(239,68,68,0.25);
     }
 
-    #result {
-      margin-top: 18px;
-      display: none;
+    #result{ margin-top:18px; display:none; }
+    #result h2{ margin:8px 0 10px; font-size:clamp(26px,5vw,40px); }
+
+    .gifBox{
+      margin:10px auto 0;
+      width:min(420px,90%);
+      aspect-ratio:16/9;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,0.28);
+      display:grid;
+      place-items:center;
+      color:rgba(255,255,255,0.75);
+      overflow:hidden;
+      background:rgba(0,0,0,0.18);
+    }
+    .gifBox img, .gifBox video{
+      width:100%; height:100%;
+      object-fit:cover;
+      display:block;
     }
 
-    #result h2 {
-      margin: 8px 0 10px;
-      font-size: clamp(26px, 5vw, 40px);
+    canvas#fx{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
     }
 
-    .gifBox {
-      margin: 10px auto 0;
-      width: min(420px, 90%);
-      aspect-ratio: 16 / 9;
-      border-radius: 18px;
-      border: 1px dashed rgba(255,255,255,0.28);
-      display: grid;
-      place-items: center;
-      color: rgba(255,255,255,0.75);
-      overflow: hidden;
-      background: rgba(0,0,0,0.18);
-    }
-
-    .gifBox img, .gifBox video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    canvas#fx {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .hidden { display: none !important; }
+    .hidden{ display:none !important; }
   </style>
 </head>
 <body>
@@ -171,7 +155,6 @@
   </div>
 
   <script>
-    // ====== אלמנטים ======
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
     const result = document.getElementById("result");
@@ -182,7 +165,7 @@
     const GIF_URL =
       "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXVndXpvZ290MDV5aGtla2R0OGdqZjlqZWpkYWM3bTAzaHJkZ2JzNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/WQr2txk5iEYUS6Kv3d/giphy.gif";
 
-    // ====== YES ======
+    // YES
     yesBtn.addEventListener("click", () => {
       result.style.display = "block";
       launchConfetti();
@@ -191,71 +174,75 @@
       gifBox.innerHTML = `<img src="${GIF_URL}" alt="gif">`;
     });
 
-    // ====== NO: בורח אבל נשאר בתוך הכרטיס (וגם עובד באייפון) ======
-    let armed = false; // כדי שיראה "טופס רגיל" עד הפעם הראשונה
+    // NO: בורח אבל נשאר בתוך הכרטיס (אייפון friendly)
+    let movedIntoCard = false;
 
-    function placeNoInitial() {
-      // איפוס – מחזירים אותו לשורה רגילה
-      noBtn.style.position = "";
-      noBtn.style.left = "";
-      noBtn.style.top = "";
-      noBtn.style.zIndex = "";
-      noBtn.style.transform = "";
-      armed = false;
-    }
+    function ensureNoInsideCardForAbsolute() {
+      if (movedIntoCard) return;
 
-    function evade(evt) {
-      // באייפון: touchstart חייב למנוע קליק, אחרת "נתפס"
-      evt?.preventDefault?.();
+      // מעבירים את הכפתור להיות ילד ישיר של card, כדי ש-absolute יהיה ביחס ל-card
+      card.appendChild(noBtn);
 
-      // הופכים ל-absolute בתוך הכרטיס
-      if (!armed) armed = true;
+      // נותנים לו מיקום התחלתי דומה למה שהיה בשורה
+      const rowRect = btnRow.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+
+      const startLeft = Math.max(12, Math.floor(rowRect.left - cardRect.left));
+      const startTop  = Math.max(12, Math.floor(rowRect.top  - cardRect.top));
 
       noBtn.style.position = "absolute";
+      noBtn.style.left = startLeft + "px";
+      noBtn.style.top  = startTop  + "px";
       noBtn.style.zIndex = "5";
       noBtn.style.transform = "none";
 
-      // גבולות לפי הכרטיס
+      movedIntoCard = true;
+    }
+
+    function evade(evt) {
+      evt?.preventDefault?.();
+
+      ensureNoInsideCardForAbsolute();
+
       const cardRect = card.getBoundingClientRect();
       const btnRect  = noBtn.getBoundingClientRect();
-      const padding = 12;
+      const padding  = 12;
 
+      // תחום תנועה בתוך הכרטיס
       const maxX = Math.max(padding, cardRect.width  - btnRect.width  - padding);
       const maxY = Math.max(padding, cardRect.height - btnRect.height - padding);
 
-      // נעדיף שהוא לא ייפול גבוה מדי על הכותרת:
-      const minY = 110; // בערך אחרי הכותרת+תיאור
-      const y = Math.floor(minY + Math.random() * Math.max(0, (maxY - minY)));
+      // לא לעלות על הכותרת/טקסט
+      const minY = 110;
+
       const x = Math.floor(padding + Math.random() * (maxX - padding));
+      const y = Math.floor(minY + Math.random() * Math.max(0, (maxY - minY)));
 
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
     }
 
-    // במחשב
-    noBtn.addEventListener("mouseover", (e) => armed && evade(e));
-    noBtn.addEventListener("mousedown", evade);
+    // Desktop: בריחה על התקרבות
+    noBtn.addEventListener("mouseenter", evade);
+    noBtn.addEventListener("mousemove", evade);
 
-    // באייפון/מובייל: Pointer Events הכי אמין
-    noBtn.addEventListener("pointerdown", evade, { passive: false });
+    // Mobile/iPhone: בריחה על מגע (הכי אמין)
     noBtn.addEventListener("touchstart", evade, { passive: false });
+    noBtn.addEventListener("pointerdown", evade, { passive: false });
 
-    // אם איכשהו נלחץ: עדיין בורח
-    noBtn.addEventListener("click", (e) => {
-      if (armed) evade(e);
-      else {
-        // בפעם הראשונה – אל תתן לו להיתפס
-        evade(e);
-      }
-    });
+    // ביטחון: אם איכשהו קליק קרה
+    noBtn.addEventListener("click", evade);
 
-    // ריסייז / סיבוב מסך באייפון
     window.addEventListener("resize", () => {
-      // אם כבר "חמוש" – שיזוז למקום חוקי
-      if (armed) evade();
+      if (movedIntoCard) evade();
+      resizeCanvas();
     });
+
     window.addEventListener("orientationchange", () => {
-      setTimeout(() => { if (armed) evade(); }, 200);
+      setTimeout(() => {
+        if (movedIntoCard) evade();
+        resizeCanvas();
+      }, 250);
     });
 
     // ====== קנבס זיקוקים ======
@@ -271,7 +258,6 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
 
     function launchConfetti() {
       const pieces = [];
@@ -303,4 +289,32 @@
           p.vy = p.vy * drag + gravity;
           p.x += p.vx;
           p.y += p.vy;
-          p.rot
+          p.rot += p.vr;
+          p.life -= 1;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = `hsl(${p.hue} 90% 60%)`;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.8);
+          ctx.restore();
+        }
+
+        for (let i = pieces.length - 1; i >= 0; i--) {
+          if (pieces[i].life <= 0 || pieces[i].y > window.innerHeight + 80) {
+            pieces.splice(i, 1);
+          }
+        }
+
+        if (pieces.length > 0 && frame < 600) {
+          requestAnimationFrame(tick);
+        } else {
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+  </script>
+</body>
+</html>
