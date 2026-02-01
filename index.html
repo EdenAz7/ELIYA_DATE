@@ -89,10 +89,10 @@
 
     /* כפתור "לא" יהיה בתוך שכבת מסך כדי שנוכל להזיז אותו חופשי */
     #noBtn {
-      position: fixed;
-      left: 55%;
-      top: 62%;
-      transform: translate(-50%, -50%);
+     background: linear-gradient(180deg, #f87171, var(--no));
+  color: #2a0b0b;
+  min-width: 150px;
+  box-shadow: 0 10px 30px rgba(239,68,68,0.25);
       background: linear-gradient(180deg, #f87171, var(--no));
       color: #2a0b0b;
       min-width: 150px;
@@ -150,8 +150,10 @@
       <p class="sub">בחירה אחת מובילה לאושר וזיקוקים. השנייה… תנסה אם בא לך 😈</p>
 
       <div class="btnRow">
-        <button id="yesBtn" aria-label="כן">YES ✅</button>
-      </div>
+  <button id="yesBtn" aria-label="כן">YES ✅</button>
+  <button id="noBtn" aria-label="לא">לא ❌</button>
+</div>
+
 
       <div id="result">
         <h2>יששששש 🎉</h2>
@@ -165,7 +167,7 @@
   </div>
 
   <!-- כפתור לא נמצא מחוץ לכרטיס כדי שיוכל לברוח בכל המסך -->
-  <button id="noBtn" aria-label="לא">לא ❌</button>
+
 
   <script>
     // ====== הגדרות ======
@@ -189,6 +191,9 @@
     // וגם אם איכשהו נלחץ (click) — הוא בורח ומבטל.
     const evade = (evt) => {
       evt?.preventDefault?.();
+
+  // ברגע ראשון שהוא בורח — הופך ל-fixed
+  noBtn.style.position = "fixed";
 
       const padding = 12; // מרווח מהקצוות
       const btnRect = noBtn.getBoundingClientRect();
