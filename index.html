@@ -25,6 +25,7 @@
                   linear-gradient(135deg, var(--bg1), var(--bg2));
       color: var(--text);
       overflow: hidden;
+      -webkit-text-size-adjust: 100%;
     }
 
     .wrap {
@@ -42,10 +43,11 @@
       padding: 28px 22px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.35);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       text-align: center;
 
-      /* חשוב לסדר שכבות */
-      position: relative;
+      position: relative; /* זירת תנועה ל"לא" */
+      overflow: hidden;   /* לא יוצא מהכרטיס */
       z-index: 1;
     }
 
@@ -63,12 +65,14 @@
     }
 
     .btnRow {
+      position: relative;
       display: flex;
       gap: 12px;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
       margin-top: 6px;
+      min-height: 56px; /* כדי שלא יקפוץ כשה"לא" הופך absolute */
     }
 
     button {
@@ -80,8 +84,8 @@
       cursor: pointer;
       user-select: none;
       touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
 
-      /* תנועה חלקה גם כש"לא" בורח */
       transition:
         transform 0.12s ease,
         filter 0.12s ease,
@@ -134,17 +138,14 @@
       display: block;
     }
 
-    /* שכבת קנבס לזיקוקים */
     canvas#fx {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0; /* חשוב: הקנבס מאחורי הכרטיס */
+      z-index: 0;
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -155,88 +156,119 @@
       <h1>אליה האם תרצי לצאת איתי ב10/02?</h1>
       <p class="sub">בחירה אחת מובילה לאושר וזיקוקים. השנייה… תנסה אם בא לך 😈</p>
 
-      <div class="btnRow">
+      <div class="btnRow" id="btnRow">
         <button id="yesBtn" aria-label="כן">YES ✅</button>
         <button id="noBtn" aria-label="לא">לא ❌</button>
       </div>
 
       <div id="result">
         <h2>יששששש 🎉</h2>
-
         <div class="gifBox" id="gifBox">
-          <span>כאן תשים GIF שלך</span>
+          <span>כאן יופיע ה-GIF</span>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // ====== הגדרות ======
+    // ====== אלמנטים ======
     const yesBtn = document.getElementById("yesBtn");
     const noBtn  = document.getElementById("noBtn");
     const result = document.getElementById("result");
     const gifBox = document.getElementById("gifBox");
+    const card   = document.getElementById("card");
+    const btnRow = document.getElementById("btnRow");
 
-    // ====== YES: הודעה + זיקוקים ======
-yesBtn.addEventListener("click", () => {
-  result.style.display = "block";
-  launchConfetti();
-  noBtn.classList.add("hidden");
-  yesBtn.style.filter = "brightness(1.05)";
+    const GIF_URL =
+      "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXVndXpvZ290MDV5aGtla2R0OGdqZjlqZWpkYWM3bTAzaHJkZ2JzNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/WQr2txk5iEYUS6Kv3d/giphy.gif";
 
-  gifBox.innerHTML = `
-    <img
-      src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXVndXpvZ290MDV5aGtla2R0OGdqZjlqZWpkYWM3bTAzaHJkZ2JzNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/WQr2txk5iEYUS6Kv3d/giphy.gif"
-      alt="celebration gif"
-    >
-  `;
-});
+    // ====== YES ======
+    yesBtn.addEventListener("click", () => {
+      result.style.display = "block";
+      launchConfetti();
+      noBtn.classList.add("hidden");
+      yesBtn.style.filter = "brightness(1.05)";
+      gifBox.innerHTML = `<img src="${GIF_URL}" alt="gif">`;
+    });
 
+    // ====== NO: בורח אבל נשאר בתוך הכרטיס (וגם עובד באייפון) ======
+    let armed = false; // כדי שיראה "טופס רגיל" עד הפעם הראשונה
 
+    function placeNoInitial() {
+      // איפוס – מחזירים אותו לשורה רגילה
+      noBtn.style.position = "";
+      noBtn.style.left = "";
+      noBtn.style.top = "";
+      noBtn.style.zIndex = "";
+      noBtn.style.transform = "";
+      armed = false;
+    }
 
-    // ====== NO: לברוח רנדומלית ======
-    const evade = (evt) => {
+    function evade(evt) {
+      // באייפון: touchstart חייב למנוע קליק, אחרת "נתפס"
       evt?.preventDefault?.();
 
-      // ברגע הראשון שהוא בורח — מעבירים ל-fixed כדי שיוכל לרוץ בכל המסך
-      noBtn.style.position = "fixed";
-      noBtn.style.zIndex = "9999";     // שלא יתחבא מאחורי הכרטיס/קנבס
-      noBtn.style.transform = "none";  // לבטל השפעות transform
+      // הופכים ל-absolute בתוך הכרטיס
+      if (!armed) armed = true;
 
+      noBtn.style.position = "absolute";
+      noBtn.style.zIndex = "5";
+      noBtn.style.transform = "none";
+
+      // גבולות לפי הכרטיס
+      const cardRect = card.getBoundingClientRect();
+      const btnRect  = noBtn.getBoundingClientRect();
       const padding = 12;
-      const btnRect = noBtn.getBoundingClientRect();
 
-      const maxX = window.innerWidth  - btnRect.width  - padding;
-      const maxY = window.innerHeight - btnRect.height - padding;
+      const maxX = Math.max(padding, cardRect.width  - btnRect.width  - padding);
+      const maxY = Math.max(padding, cardRect.height - btnRect.height - padding);
 
-      const x = Math.max(padding, Math.floor(Math.random() * maxX));
-      const y = Math.max(padding, Math.floor(Math.random() * maxY));
+      // נעדיף שהוא לא ייפול גבוה מדי על הכותרת:
+      const minY = 110; // בערך אחרי הכותרת+תיאור
+      const y = Math.floor(minY + Math.random() * Math.max(0, (maxY - minY)));
+      const x = Math.floor(padding + Math.random() * (maxX - padding));
 
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
-    };
+    }
 
-    // מחשב
-    noBtn.addEventListener("mouseover", evade);
+    // במחשב
+    noBtn.addEventListener("mouseover", (e) => armed && evade(e));
     noBtn.addEventListener("mousedown", evade);
-    // מובייל
+
+    // באייפון/מובייל: Pointer Events הכי אמין
+    noBtn.addEventListener("pointerdown", evade, { passive: false });
     noBtn.addEventListener("touchstart", evade, { passive: false });
-    // ביטחון כפול
-    noBtn.addEventListener("click", evade);
 
-    // אם משנים גודל חלון — שלא ייצא מחוץ למסך
-    window.addEventListener("resize", () => evade());
+    // אם איכשהו נלחץ: עדיין בורח
+    noBtn.addEventListener("click", (e) => {
+      if (armed) evade(e);
+      else {
+        // בפעם הראשונה – אל תתן לו להיתפס
+        evade(e);
+      }
+    });
 
-    // ====== זיקוקים (קונפטי) בקנבס ======
+    // ריסייז / סיבוב מסך באייפון
+    window.addEventListener("resize", () => {
+      // אם כבר "חמוש" – שיזוז למקום חוקי
+      if (armed) evade();
+    });
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => { if (armed) evade(); }, 200);
+    });
+
+    // ====== קנבס זיקוקים ======
     const canvas = document.getElementById("fx");
     const ctx = canvas.getContext("2d");
 
     function resizeCanvas() {
-      canvas.width  = window.innerWidth * devicePixelRatio;
-      canvas.height = window.innerHeight * devicePixelRatio;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = Math.floor(window.innerWidth * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
       canvas.style.width  = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
-      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
@@ -271,37 +303,4 @@ yesBtn.addEventListener("click", () => {
           p.vy = p.vy * drag + gravity;
           p.x += p.vx;
           p.y += p.vy;
-          p.rot += p.vr;
-          p.life -= 1;
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-
-          ctx.fillStyle = `hsl(${p.hue} 90% 60%)`;
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.8);
-
-          ctx.restore();
-        }
-
-        for (let i = pieces.length - 1; i >= 0; i--) {
-          if (pieces[i].life <= 0 || pieces[i].y > window.innerHeight + 80) {
-            pieces.splice(i, 1);
-          }
-        }
-
-        if (pieces.length > 0 && frame < 600) {
-          requestAnimationFrame(tick);
-        } else {
-          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        }
-      }
-
-      requestAnimationFrame(tick);
-    }
-
-    // ====== איך מוסיפים GIF בקלות ======
-    // gifBox.innerHTML = '<img src="my.gif" alt="gif">';
-  </script>
-</body>
-</html>
+          p.rot
