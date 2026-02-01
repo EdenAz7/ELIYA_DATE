@@ -43,6 +43,10 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.35);
       backdrop-filter: blur(10px);
       text-align: center;
+
+      /* חשוב לסדר שכבות */
+      position: relative;
+      z-index: 1;
     }
 
     h1 {
@@ -74,9 +78,15 @@
       font-size: 18px;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.12s ease, filter 0.12s ease;
       user-select: none;
       touch-action: manipulation;
+
+      /* תנועה חלקה גם כש"לא" בורח */
+      transition:
+        transform 0.12s ease,
+        filter 0.12s ease,
+        left 0.08s linear,
+        top 0.08s linear;
     }
     button:active { transform: scale(0.98); }
 
@@ -87,12 +97,7 @@
       box-shadow: 0 10px 30px rgba(34,197,94,0.25);
     }
 
-    /* כפתור "לא" יהיה בתוך שכבת מסך כדי שנוכל להזיז אותו חופשי */
     #noBtn {
-     background: linear-gradient(180deg, #f87171, var(--no));
-  color: #2a0b0b;
-  min-width: 150px;
-  box-shadow: 0 10px 30px rgba(239,68,68,0.25);
       background: linear-gradient(180deg, #f87171, var(--no));
       color: #2a0b0b;
       min-width: 150px;
@@ -134,6 +139,7 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
+      z-index: 0; /* חשוב: הקנבס מאחורי הכרטיס */
     }
 
     .hidden {
@@ -150,24 +156,19 @@
       <p class="sub">בחירה אחת מובילה לאושר וזיקוקים. השנייה… תנסה אם בא לך 😈</p>
 
       <div class="btnRow">
-  <button id="yesBtn" aria-label="כן">YES ✅</button>
-  <button id="noBtn" aria-label="לא">לא ❌</button>
-</div>
-
+        <button id="yesBtn" aria-label="כן">YES ✅</button>
+        <button id="noBtn" aria-label="לא">לא ❌</button>
+      </div>
 
       <div id="result">
         <h2>יששששש 🎉</h2>
 
-        <!-- מקום ל-GIF: פשוט תחליף את התמונה/שים GIF משלך -->
         <div class="gifBox" id="gifBox">
-          <span>כאן תשים GIF שלך (תכף הסבר למטה)</span>
+          <span>כאן תשים GIF שלך</span>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- כפתור לא נמצא מחוץ לכרטיס כדי שיוכל לברוח בכל המסך -->
-
 
   <script>
     // ====== הגדרות ======
@@ -180,34 +181,30 @@
     yesBtn.addEventListener("click", () => {
       result.style.display = "block";
       launchConfetti();
-      // אופציונלי: להסתיר את כפתור "לא" אחרי ניצחון
       noBtn.classList.add("hidden");
-      // וקצת אפקט קטן
       yesBtn.style.filter = "brightness(1.05)";
     });
 
     // ====== NO: לברוח רנדומלית ======
-    // אנחנו מזיזים את הכפתור על "התקרבות" (mouseover/touchstart),
-    // וגם אם איכשהו נלחץ (click) — הוא בורח ומבטל.
     const evade = (evt) => {
       evt?.preventDefault?.();
 
-  // ברגע ראשון שהוא בורח — הופך ל-fixed
-  noBtn.style.position = "fixed";
+      // ברגע הראשון שהוא בורח — מעבירים ל-fixed כדי שיוכל לרוץ בכל המסך
+      noBtn.style.position = "fixed";
+      noBtn.style.zIndex = "9999";     // שלא יתחבא מאחורי הכרטיס/קנבס
+      noBtn.style.transform = "none";  // לבטל השפעות transform
 
-      const padding = 12; // מרווח מהקצוות
+      const padding = 12;
       const btnRect = noBtn.getBoundingClientRect();
 
       const maxX = window.innerWidth  - btnRect.width  - padding;
       const maxY = window.innerHeight - btnRect.height - padding;
 
-      // רנדומליות "טובה": תדאג שלא יהיה מתחת לכרטיס עצמו מדי הרבה
       const x = Math.max(padding, Math.floor(Math.random() * maxX));
       const y = Math.max(padding, Math.floor(Math.random() * maxY));
 
       noBtn.style.left = x + "px";
       noBtn.style.top  = y + "px";
-      noBtn.style.transform = "none";
     };
 
     // מחשב
@@ -219,10 +216,7 @@
     noBtn.addEventListener("click", evade);
 
     // אם משנים גודל חלון — שלא ייצא מחוץ למסך
-    window.addEventListener("resize", () => {
-      // מעיף אותו שוב למקום חוקי
-      evade();
-    });
+    window.addEventListener("resize", () => evade());
 
     // ====== זיקוקים (קונפטי) בקנבס ======
     const canvas = document.getElementById("fx");
@@ -281,7 +275,6 @@
           ctx.restore();
         }
 
-        // מסננים חלקיקים "מתים"
         for (let i = pieces.length - 1; i >= 0; i--) {
           if (pieces[i].life <= 0 || pieces[i].y > window.innerHeight + 80) {
             pieces.splice(i, 1);
@@ -299,10 +292,6 @@
     }
 
     // ====== איך מוסיפים GIF בקלות ======
-    // אופציה 1: החלף את התוכן של gifBox בתמונה:
-    // gifBox.innerHTML = '<img src="YOUR_GIF_URL_OR_FILE.gif" alt="gif">';
-    //
-    // לדוגמה: אם שמת קובץ בשם my.gif באותה תיקיה:
     // gifBox.innerHTML = '<img src="my.gif" alt="gif">';
   </script>
 </body>
