@@ -178,12 +178,15 @@
     const gifBox = document.getElementById("gifBox");
 
     // ====== YES: הודעה + זיקוקים ======
-    yesBtn.addEventListener("click", () => {
-      result.style.display = "block";
-      launchConfetti();
-      noBtn.classList.add("hidden");
-      yesBtn.style.filter = "brightness(1.05)";
-    });
+yesBtn.addEventListener("click", () => {
+  result.style.display = "block";
+  launchConfetti();
+  noBtn.classList.add("hidden");
+  yesBtn.style.filter = "brightness(1.05)";
+
+  gifBox.innerHTML = '<img src="happy.gif" alt="gif">';
+});
+
 
     // ====== NO: לברוח רנדומלית ======
     const evade = (evt) => {
