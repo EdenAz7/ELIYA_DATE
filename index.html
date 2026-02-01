@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>שאלה חשובה 😄</title>
+  <style>
+    :root {
+      --bg1: #0b1020;
+      --bg2: #141a33;
+      --card: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.14);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.72);
+      --yes: #22c55e;
+      --no: #ef4444;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 20%, #1d2a6d 0%, transparent 55%),
+                  radial-gradient(1000px 700px at 80% 40%, #7c2d12 0%, transparent 50%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .wrap {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(720px, 94vw);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(22px, 4vw, 34px);
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .btnRow {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, filter 0.12s ease;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    button:active { transform: scale(0.98); }
+
+    #yesBtn {
+      background: linear-gradient(180deg, #34d399, var(--yes));
+      color: #07240f;
+      min-width: 150px;
+      box-shadow: 0 10px 30px rgba(34,197,94,0.25);
+    }
+
+    /* כפתור "לא" יהיה בתוך שכבת מסך כדי שנוכל להזיז אותו חופשי */
+    #noBtn {
+      position: fixed;
+      left: 55%;
+      top: 62%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(180deg, #f87171, var(--no));
+      color: #2a0b0b;
+      min-width: 150px;
+      box-shadow: 0 10px 30px rgba(239,68,68,0.25);
+    }
+
+    #result {
+      margin-top: 18px;
+      display: none;
+    }
+
+    #result h2 {
+      margin: 8px 0 10px;
+      font-size: clamp(26px, 5vw, 40px);
+    }
+
+    .gifBox {
+      margin: 10px auto 0;
+      width: min(420px, 90%);
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,0.28);
+      display: grid;
+      place-items: center;
+      color: rgba(255,255,255,0.75);
+      overflow: hidden;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .gifBox img, .gifBox video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* שכבת קנבס לזיקוקים */
+    canvas#fx {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fx"></canvas>
+
+  <div class="wrap">
+    <div class="card" id="card">
+      <h1>אליה האם תרצי לצאת איתי ב10/02?</h1>
+      <p class="sub">בחירה אחת מובילה לאושר וזיקוקים. השנייה… תנסה אם בא לך 😈</p>
+
+      <div class="btnRow">
+        <button id="yesBtn" aria-label="כן">YES ✅</button>
+      </div>
+
+      <div id="result">
+        <h2>יששששש 🎉</h2>
+
+        <!-- מקום ל-GIF: פשוט תחליף את התמונה/שים GIF משלך -->
+        <div class="gifBox" id="gifBox">
+          <span>כאן תשים GIF שלך (תכף הסבר למטה)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- כפתור לא נמצא מחוץ לכרטיס כדי שיוכל לברוח בכל המסך -->
+  <button id="noBtn" aria-label="לא">לא ❌</button>
+
+  <script>
+    // ====== הגדרות ======
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const result = document.getElementById("result");
+    const gifBox = document.getElementById("gifBox");
+
+    // ====== YES: הודעה + זיקוקים ======
+    yesBtn.addEventListener("click", () => {
+      result.style.display = "block";
+      launchConfetti();
+      // אופציונלי: להסתיר את כפתור "לא" אחרי ניצחון
+      noBtn.classList.add("hidden");
+      // וקצת אפקט קטן
+      yesBtn.style.filter = "brightness(1.05)";
+    });
+
+    // ====== NO: לברוח רנדומלית ======
+    // אנחנו מזיזים את הכפתור על "התקרבות" (mouseover/touchstart),
+    // וגם אם איכשהו נלחץ (click) — הוא בורח ומבטל.
+    const evade = (evt) => {
+      evt?.preventDefault?.();
+
+      const padding = 12; // מרווח מהקצוות
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const maxX = window.innerWidth  - btnRect.width  - padding;
+      const maxY = window.innerHeight - btnRect.height - padding;
+
+      // רנדומליות "טובה": תדאג שלא יהיה מתחת לכרטיס עצמו מדי הרבה
+      const x = Math.max(padding, Math.floor(Math.random() * maxX));
+      const y = Math.max(padding, Math.floor(Math.random() * maxY));
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+      noBtn.style.transform = "none";
+    };
+
+    // מחשב
+    noBtn.addEventListener("mouseover", evade);
+    noBtn.addEventListener("mousedown", evade);
+    // מובייל
+    noBtn.addEventListener("touchstart", evade, { passive: false });
+    // ביטחון כפול
+    noBtn.addEventListener("click", evade);
+
+    // אם משנים גודל חלון — שלא ייצא מחוץ למסך
+    window.addEventListener("resize", () => {
+      // מעיף אותו שוב למקום חוקי
+      evade();
+    });
+
+    // ====== זיקוקים (קונפטי) בקנבס ======
+    const canvas = document.getElementById("fx");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width  = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width  = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    function launchConfetti() {
+      const pieces = [];
+      const count = 180;
+      const gravity = 0.12;
+      const drag = 0.995;
+
+      for (let i = 0; i < count; i++) {
+        pieces.push({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 3,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 1.2) * 10,
+          size: 4 + Math.random() * 6,
+          rot: Math.random() * Math.PI,
+          vr: (Math.random() - 0.5) * 0.2,
+          life: 180 + Math.random() * 60,
+          hue: Math.floor(Math.random() * 360)
+        });
+      }
+
+      let frame = 0;
+      function tick() {
+        frame++;
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        for (const p of pieces) {
+          p.vx *= drag;
+          p.vy = p.vy * drag + gravity;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          p.life -= 1;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+
+          ctx.fillStyle = `hsl(${p.hue} 90% 60%)`;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.8);
+
+          ctx.restore();
+        }
+
+        // מסננים חלקיקים "מתים"
+        for (let i = pieces.length - 1; i >= 0; i--) {
+          if (pieces[i].life <= 0 || pieces[i].y > window.innerHeight + 80) {
+            pieces.splice(i, 1);
+          }
+        }
+
+        if (pieces.length > 0 && frame < 600) {
+          requestAnimationFrame(tick);
+        } else {
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    // ====== איך מוסיפים GIF בקלות ======
+    // אופציה 1: החלף את התוכן של gifBox בתמונה:
+    // gifBox.innerHTML = '<img src="YOUR_GIF_URL_OR_FILE.gif" alt="gif">';
+    //
+    // לדוגמה: אם שמת קובץ בשם my.gif באותה תיקיה:
+    // gifBox.innerHTML = '<img src="my.gif" alt="gif">';
+  </script>
+</body>
+</html>
